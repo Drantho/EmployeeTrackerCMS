@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/Drantho/EmployeeTrackerCMS/issues"
   },
-  "homepage": "https://github.com/Drantho/EmployeeTrackerCMS#readme"
+  "homepage": "https://github.com/Drantho/EmployeeTrackerCMS#readme",
+  "dependencies": {
+    "add": "^2.0.6",
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1"
+  }
 }
