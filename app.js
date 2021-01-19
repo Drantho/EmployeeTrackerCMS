@@ -1,4 +1,5 @@
 const inquirer = require("inquirer");
+const connection = require("./lib/Database");
 const Department = require("./lib/Department");
 const Role = require("./lib/Role");
 
@@ -7,7 +8,7 @@ const mainQuestions = [
         "name": "action",
         "type": "list",
         "message": "What would you like to do?",
-        "choices": ["Add Department", "View Departments", "Add Role", "Quit"]
+        "choices": ["Add Department", "View Departments", "Add Role", "View Roles", "Quit"]
     }
 ]
 
@@ -32,7 +33,11 @@ const main = () => {
             case "Add Role":
                 addRole();
                 return;
+            case "View Roles":
+                Role.viewRoles().then(()=>{main()});
+                return;
             default:
+                connection.end();
                 return;
         }
     })
