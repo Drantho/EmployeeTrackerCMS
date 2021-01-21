@@ -101,16 +101,11 @@ const updateDepartment = async () =>{
         }
     ];
 
-    inquirer.prompt(updateDepartmentQuestions).then(response => {
-        console.log(`response: `, response);
-        connection.query("UPDATE department SET ? WHERE ?", [{department_name: response.name}, {id: response.department.id}], (err, result) => {
-            if(err){
-                throw err
-            }
-
-            console.log(`Department id: ${response.department.id} updated to ${response.name}.`);
-            main();
-        })
+    inquirer.prompt(updateDepartmentQuestions).then(async response => {
+        const department = new Department(response.name, response.department.id);
+        department.updateDepartmentInDatabase();
+        department.displayDepartment();
+        main(); 
     });
 }
 
