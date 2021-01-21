@@ -19,6 +19,7 @@ const main = () => {
                 "Add Role", 
                 "View Roles",
                 "Update Role", 
+                "Delete Role", 
                 "Add Employee", 
                 "View Employees",
                 "Update Employee", 
@@ -48,6 +49,9 @@ const main = () => {
                 return;
             case "Update Role" :
                 updateRole();
+                break;
+            case "Delete Role" :
+                deleteRole();
                 break;
             case "Add Employee" :
                 addEmployee();
@@ -230,6 +234,33 @@ const updateRole = async () => {
     })
 }
 
+const deleteRole = async () => {
+    const departments = await Department.getDepartments();
+    const roles = await Role.getRoles();
+
+    const deleteRoleQuestions = [
+        {
+            "name": "role",
+            "type": "list",
+            "message": "Select role to delete",
+            "choices": roles
+        }
+    ];
+    
+    inquirer.prompt(deleteRoleQuestions).then(async response => {
+
+        const role = new Role(response.title, response.salary, new Department(), response.role.role_id);
+        
+        // role.updateRoleInDatabase();
+
+        role.deleteRole();
+        console.log(`Role deleted successfully`);
+
+        main();
+
+    })
+}
+
 const addEmployee = async () => {
     const roles = await Role.getRoles();
     const employees = await Employee.getEmployees();
@@ -328,3 +359,4 @@ const updateEmployee = async () => {
 
     })
 }
+
