@@ -5,24 +5,15 @@ const Role = require("./lib/Role");
 const Employee = require("./lib/Employee");
 const { viewEmployees } = require("./lib/Employee");
 
-const mainQuestions = [
-    {
-        "name": "action",
-        "type": "list",
-        "message": "What would you like to do?",
-        "choices": ["Add Department", "View Departments", "Update Department", "Add Role", "View Roles", "Add Employee", "View Employees", "Quit"]
-    }
-]
-
-const addDepartmentquestions = [
-    {
-        "name": "name",
-        "type": "input",
-        "message": "Enter department name: "
-    }
-]
-
 const main = () => {
+    const mainQuestions = [
+        {
+            "name": "action",
+            "type": "list",
+            "message": "What would you like to do?",
+            "choices": ["Add Department", "View Departments", "Update Department", "Delete Department", "Add Role", "View Roles", "Add Employee", "View Employees", "Quit"]
+        }
+    ]
 
     inquirer.prompt(mainQuestions).then(response => {
         switch (response.action) {
@@ -35,6 +26,9 @@ const main = () => {
             case "Update Department":
                 updateDepartment();
                 break;
+            case "Delete Department":
+                    deleteDepartment();
+                    break;
             case "Add Role":
                 addRole();
                 return;
@@ -46,17 +40,24 @@ const main = () => {
                 return;
             case "View Employees" :
                 Employee.viewEmployees().then(()=>main())
+                return;
             default:
-                // connection.end();
+                connection.end();
                 return;
         }
     })
 }
-
 main();
 
 const addDepartment = async () => {
 
+    const addDepartmentquestions = [
+        {
+            "name": "name",
+            "type": "input",
+            "message": "Enter department name: "
+        }
+    ]
     const response = await inquirer.prompt(addDepartmentquestions);
 
     console.log(response);
@@ -96,6 +97,40 @@ const updateDepartment = async () =>{
 
             console.log(`Department id: ${response.department.id} updated to ${response.name}.`);
             main();
+        })
+    });
+}
+
+const deleteDepartment = async () => {
+    const departments = await Department.getDepartments();
+
+    const deleteDepartmentQuestions = [
+        {
+            "name": "department",
+            "type": "list",
+            "message": "Select a department to delete",
+            "choices": departments
+        }
+    ];
+
+    inquirer.prompt(deleteDepartmentQuestions).then(response => {
+
+        connection.query("SELECT * FROM role WHERE ?", {department_ref: response.id}, (err, data) => {
+
+            if(data.length > 0){
+                console.log(`The following roles will have their deparment link broken:`);
+                console.table(data);
+            }
+            
+            connection.query("DELETE FROM department WHERE ?", [{id: response.department.id}], (err, result) => {
+                if(err){
+                    throw err
+                }
+    
+                console.log(`Department deleted. `);
+                main();
+            })
+
         })
     });
 }
