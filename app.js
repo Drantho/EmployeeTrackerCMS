@@ -20,7 +20,8 @@ const main = () => {
                 "View Roles",
                 "Update Role", 
                 "Add Employee", 
-                "View Employees", 
+                "View Employees",
+                "Update Employee", 
                 "Quit"]
         }
     ]
@@ -54,6 +55,9 @@ const main = () => {
             case "View Employees" :
                 Employee.viewEmployees().then(()=>main())
                 return;
+            case "Update Employee" :
+                updateEmployee();
+                break;
             default:
                 connection.end();
                 return;
@@ -265,6 +269,58 @@ const addEmployee = async () => {
         const employee = new Employee(response.firstName, response.lastName, role, manager);
 
         employee.setId(await employee.saveEmployeeToDatabase());
+
+        employee.displayEmployee();
+
+        main();
+
+    })
+}
+
+const updateEmployee = async () => {
+    const roles = await Role.getRoles();
+    const employees = await Employee.getEmployees();
+
+    const updateEmployeeQuestions = [
+        {
+            "name": "employee",
+            "type": "list",
+            "message": "Select employee to update",
+            "choices": employees
+        },
+        {
+            "name": "firstName",
+            "type": "input",
+            "message": "Enter first name: "
+        },
+        {
+            "name": "lastName",
+            "type": "input",
+            "message": "Enter Last Name: "
+        },
+        {
+            "name": "role",
+            "type": "list",
+            "message": "Select role: ",
+            "choices": roles
+        },
+        {
+            "name": "manager",
+            "type": "list",
+            "message": "Select a manager",
+            "choices": employees
+        }
+    ];
+
+    inquirer.prompt(updateEmployeeQuestions).then(async response => {
+
+        const department = new Department( response.role.department, response.role.department_id);
+        const role = new Role(response.role.title, response.role.salary, department, response.role.role_id);
+        const manager = new Employee(response.manager.first_name, response.manager.last_name, {}, 0, response.manager.id || 0)
+        
+        const employee = new Employee(response.firstName, response.lastName, role, manager, response.employee.id);
+
+        employee.updateEmployeeInDatabase();
 
         employee.displayEmployee();
 
