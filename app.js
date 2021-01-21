@@ -11,7 +11,17 @@ const main = () => {
             "name": "action",
             "type": "list",
             "message": "What would you like to do?",
-            "choices": ["Add Department", "View Departments", "Update Department", "Delete Department", "Add Role", "View Roles", "Add Employee", "View Employees", "Quit"]
+            "choices": [
+                "Add Department", 
+                "View Departments", 
+                "Update Department", 
+                "Delete Department", 
+                "Add Role", 
+                "View Roles",
+                "Update Role", 
+                "Add Employee", 
+                "View Employees", 
+                "Quit"]
         }
     ]
 
@@ -27,14 +37,17 @@ const main = () => {
                 updateDepartment();
                 break;
             case "Delete Department":
-                    deleteDepartment();
-                    break;
+                deleteDepartment();
+                break;
             case "Add Role":
                 addRole();
                 return;
             case "View Roles":
                 Role.viewRoles().then(()=>{main()});
                 return;
+            case "Update Role" :
+                updateRole();
+                break;
             case "Add Employee" :
                 addEmployee();
                 return;
@@ -165,6 +178,51 @@ const addRole = async () => {
         const role = new Role(response.title, response.salary, department);
 
         role.setId(await role.saveRoleToDatabase());
+
+        role.displayRole();
+
+        main();
+
+    })
+}
+
+const updateRole = async () => {
+
+    const departments = await Department.getDepartments();
+    const roles = await Role.getRoles();
+
+    const editRoleQuestions = [
+        {
+            "name": "role",
+            "type": "list",
+            "message": "Select role to edit",
+            "choices": roles
+        },
+        {
+            "name": "title",
+            "type": "input",
+            "message": "Enter role title: "
+        },
+        {
+            "name": "salary",
+            "type": "input",
+            "message": "Enter role salary: "
+        },
+        {
+            "name": "department",
+            "type": "list",
+            "message": "Select role department: ",
+            "choices": departments
+        }
+    ]
+
+    
+    inquirer.prompt(editRoleQuestions).then(async response => {
+
+        const department = new Department(response.department.department_name, response.department.id);
+        const role = new Role(response.title, response.salary, department, response.role.role_id);
+        
+        console.log((await role.updateRoleInDatabase()));
 
         role.displayRole();
 
