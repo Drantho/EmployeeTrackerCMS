@@ -334,7 +334,7 @@ const addEmployee = async () => {
     const response = await inquirer.prompt(addEmployeeQuestions);
 
     // create new department, role, employee, and manager objects
-    const department = new Department(response.role.department, response.role.department_id);
+    const department = new Department(response.role.name, response.role.department_id);
     const role = new Role(response.role.title, response.role.salary, department, response.role.role_id);
     const manager = new Employee(response.manager.first_name, response.manager.last_name, {}, 0, response.manager.id || 0)
 
