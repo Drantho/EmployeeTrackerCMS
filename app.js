@@ -159,26 +159,13 @@ const deleteDepartment = async () => {
     // get department to delete from user
     const response = await inquirer.prompt(deleteDepartmentQuestions);
 
-    // warn user if they are deleting a department that has a role currently linked
-    connection.query("SELECT * FROM role WHERE ?", { department_ref: response.id }, (err, data) => {
+    // create new department object
+    const department = new Department(response.department.name, response.department.id);
 
-        if (data.length > 0) {
-            console.log(`The following roles will have their deparment link broken:`);
-            console.table(data);
-        }
+    // delete department and return to main
+    department.deleteDepartmentFromDatabase();
 
-        // delete selected department
-        connection.query("DELETE FROM department WHERE ?", [{ id: response.department.id }], (err, result) => {
-            if (err) {
-                throw err
-            }
-
-            // inform user of success and call main
-            console.log(`Department deleted. `);
-            main();
-        })
-
-    })
+    main();
 }
 
 // add new role to database function
@@ -211,7 +198,7 @@ const addRole = async () => {
     const response = await inquirer.prompt(addRoleQuestions)
 
     // create new department object to include in role
-    const department = new Department(response.department.department_name, response.department.id);
+    const department = new Department(response.department.name, response.department.id);
 
     // create new role object
     const role = new Role(response.title, response.salary, department);
@@ -263,7 +250,7 @@ const updateRole = async () => {
     const response = await inquirer.prompt(editRoleQuestions);
 
     // create department object for use in role
-    const department = new Department(response.department.department_name, response.department.id);
+    const department = new Department(response.department.name, response.department.id);
     // create role object
     const role = new Role(response.title, response.salary, department, response.role.role_id);
 
